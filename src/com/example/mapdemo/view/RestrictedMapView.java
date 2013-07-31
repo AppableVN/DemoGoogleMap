@@ -1,5 +1,10 @@
 package com.example.mapdemo.view;
 
+import static com.google.android.gms.maps.GoogleMap.MAP_TYPE_HYBRID;
+import static com.google.android.gms.maps.GoogleMap.MAP_TYPE_NORMAL;
+import static com.google.android.gms.maps.GoogleMap.MAP_TYPE_SATELLITE;
+import static com.google.android.gms.maps.GoogleMap.MAP_TYPE_TERRAIN;
+
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Handler;
@@ -277,10 +282,11 @@ public class RestrictedMapView extends MapView {
 				if (map != null) {
 					getMap().getUiSettings().setZoomControlsEnabled(true);
 					map.getUiSettings().setAllGesturesEnabled(false);
-					map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-							new LatLng(DEF_LATITUDE, DEF_LONGITUDE), DEF_ZOOM));
+//					map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+//							new LatLng(DEF_LATITUDE, DEF_LONGITUDE), DEF_ZOOM));
 					map.getUiSettings().setZoomGesturesEnabled(true);
 					map.getUiSettings().setScrollGesturesEnabled(true);
+					map.setMapType(MAP_TYPE_NORMAL);
 //					mLastCorrectRegion = map.getProjection().getVisibleRegion();
 //					mGestureDetector = new GestureDetector(mContext,
 //							mGestudeListener);
