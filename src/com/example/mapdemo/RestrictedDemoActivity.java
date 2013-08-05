@@ -20,6 +20,7 @@ import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
+import com.google.android.gms.maps.LocationSource.OnLocationChangedListener;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -214,6 +215,7 @@ public class RestrictedDemoActivity extends FragmentActivity implements
 
 	@Override
 	public boolean onMarkerClick(Marker marker) {
+		Log.d(getLocalClassName(), "onMarkerClick");
 		String titleMarker = marker.getTitle();
 		if (previousState != null) {
 			previousState.polygon.remove();
@@ -235,7 +237,13 @@ public class RestrictedDemoActivity extends FragmentActivity implements
 				break;
 			}
 		}
-		return false;
+
+		animateCameraTo(marker.getPosition().latitude, marker.getPosition().longitude);
+		marker.showInfoWindow();
+		// We return false to indicate that we have not consumed the event and that we wish
+		// for the default behavior to occur (which is for the camera to move such that the
+		// marker is centered and for the marker's info window to open, if it has one).
+		return true;
 	}
 
 	private void initMarkerInMap() {
@@ -327,6 +335,8 @@ public class RestrictedDemoActivity extends FragmentActivity implements
 
 	@Override
 	public void onMapClick(final LatLng latlng) {
+		Log.d(getLocalClassName(), "onMapClick");
+		
 		if (previousState != null) {
 			previousState.polygon.remove();
 		}
@@ -346,7 +356,7 @@ public class RestrictedDemoActivity extends FragmentActivity implements
 				state.polygon = polygonMap;
 				previousState = state;
 
-				animateCameraTo(latlng.latitude, latlng.longitude);
+				animateCameraTo(state.centerPoint.latitude, state.centerPoint.longitude);
 				break;
 			}
 		}
@@ -361,11 +371,14 @@ public class RestrictedDemoActivity extends FragmentActivity implements
 			mMap.getUiSettings().setScrollGesturesEnabled(false);
 			mMap.animateCamera(
 					CameraUpdateFactory.newLatLng(new LatLng(lat, lng)),
+					500,
 					new CancelableCallback() {
 
 						@Override
 						public void onFinish() {
 							mMap.getUiSettings().setScrollGesturesEnabled(true);
+							CameraUpdate zoom = CameraUpdateFactory.zoomTo(5);
+							mMap.animateCamera(zoom);
 						}
 
 						@Override
@@ -427,12 +440,6 @@ public class RestrictedDemoActivity extends FragmentActivity implements
 					lstPointState.get(i).lng);
 			LatLng point_j = new LatLng(lstPointState.get(j).lat,
 					lstPointState.get(j).lng);
-			// verti = CGPointMake([[[arrPoints objectAtIndex:i]
-			// objectForKey:@"lat"] floatValue], [[[arrPoints objectAtIndex:i]
-			// objectForKey:@"lng"] floatValue]);
-			// vertj = CGPointMake([[[arrPoints objectAtIndex:j]
-			// objectForKey:@"lat"] floatValue], [[[arrPoints objectAtIndex:j]
-			// objectForKey:@"lng"] floatValue]);
 			if (((point_i.longitude > point2Check.longitude) != (point_j.longitude > point2Check.longitude))
 					&& (point2Check.latitude < (point_j.latitude - point_i.latitude)
 							* (point2Check.longitude - point_i.longitude)
